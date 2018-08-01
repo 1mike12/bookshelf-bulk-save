@@ -1,5 +1,5 @@
 { "name": "bookshelf-bulk-save",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "add bulk save method to bookshelf collections",
   "main": "index.js",
   "repository": {

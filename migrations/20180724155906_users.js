@@ -5,6 +5,7 @@ module.exports = {
         return knex.schema.createTableIfNotExists(TABLE_NAME, function(table){
             table.increments();
             table.string("name");
+            table.float("age");
         });
     },
     down: (knex, Promise) =>{
