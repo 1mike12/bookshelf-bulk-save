@@ -33,20 +33,19 @@ module.exports = function (Bookshelf){
             let res = await Bookshelf.knex(tableName).insert(toInsert).returning("*");
 
             //only certain datbases return full data on rows, which we need to construct new collection.
-            if(DIALECTS_WITH_FULL_RETURN.has(Bookshelf.knex.client.config.client)) {
-                const collection = this.forgeCollection(res)
-                return collection;
+            if (DIALECTS_WITH_FULL_RETURN.has(Bookshelf.knex.client.config.client)){
+               return this.forgeCollection(res);
             } else {
                 return true;
             }
 
         },
-        forgeCollection: function (jsonArray){
+        forgeCollection : function(json){
             const Collection = Bookshelf.Collection.extend({
-                model: this
+                model: this.model
             });
-            if(jsonArray) {
-                return Collection.forge(jsonArray)
+            if (json) {
+                return Collection.forge(json)
             }
             return Collection.forge();
         }

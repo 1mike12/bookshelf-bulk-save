@@ -16,7 +16,7 @@ const userCollection = Collection.forge([
     }
 ]);
 
-describe("postgres bulk save", function(){
+describe("postgres bulk save", function (){
     const Users = db.bookshelf.Collection.extend({model: User});
     const UserCollection = Users.forge([
         {
@@ -29,19 +29,14 @@ describe("postgres bulk save", function(){
         }
     ]);
 
-    it("should return full collection", async () =>{
+    it("should return full collection", async () => {
         await db.refresh();
         db.bookshelf.plugin(require("bookshelf-column-cache"));
         let hasError = false;
-        try {
-            let users = await UserCollection.bulkSave();
-            expect(users.length).equal(2);
-            expect(typeof users !== "boolean").true;
-            expect(Array.isArray(users)).true;
-        } catch (e) {
-            hasError = true;
-        }
-        expect(hasError).to.be.false
+        let users = await UserCollection.bulkSave();
+        expect(users.length).equal(2);
+        expect(typeof users !== "boolean").equals(true);
+        expect(users instanceof db.bookshelf.Collection)
     });
 
 });
