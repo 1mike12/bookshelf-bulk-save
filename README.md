@@ -5,7 +5,7 @@ Bookshelf natively does not come with a bulk insert option. Instead the only opt
 
 This does not run updates, as bulk updates are not supported natively by knex.
 
-This plugin adds a `bulkSave()` method to Collection objects. If your db dialect supports it, it will also return the inserted JSON data, similar to how `save()` on a single model returns the updated model. As of writing this is (pg, mssql, oracledb). Otherwise it will simply return `true` on successful insert.
+This plugin adds a `bulkSave()` method to Collection objects. If your db dialect supports it, it will also update the new ids and return the collection, similar to how `save()` on a single model returns the updated model. As of writing this is (pg, mssql, oracledb). Otherwise it will simply return `true` on successful insert.
 
 requires es6 syntax to work.
 

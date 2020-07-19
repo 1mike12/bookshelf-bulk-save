@@ -69,7 +69,13 @@ module.exports = function (Bookshelf){
 
             //only certain datbases return full data on rows, which we need to construct new collection.
             if (IS_FULL_RETURN_DIALECT){
-                return [...insertedJson, ...updatedJson];
+                if (this.models.length !== insertedJson.length) throw new Error("to insert and inserted array not same length")
+                for (let i = 0; i< this.models.length; i++){
+                    const model = this.models[i];
+                    await model.triggerThen("saved", model)
+                    model.set(insertedJson[i])
+                }
+                return this
             } else {
                 return true;
             }
