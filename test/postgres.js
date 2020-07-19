@@ -31,7 +31,6 @@ describe("postgres bulk save", function (){
 
     it("should return full collection", async () => {
         await db.refresh();
-        db.bookshelf.plugin(require("bookshelf-column-cache"));
         let hasError = false;
         let users = await UserCollection.bulkSave();
         expect(users.length).equal(2);

@@ -6,27 +6,41 @@ module.exports = function (Bookshelf){
          * @return {Promise<Array|Boolean>} returns array of JSON values of inserted items. Or true for databases that do not support return values
          */
         bulkSave: async function (){
-            if(!Bookshelf.ColumnCache) throw new Error("plugin bookshelf-column-cache not found. Did you install it and add it?");
             if(this.models.length === 0) {
                 if(DIALECTS_WITH_FULL_RETURN.has(Bookshelf.knex.client.config.client)) {
-                    return [];
+                    return this.forgeCollection();
                 } else {
                     return true;
                 }
             }
             const tableName = this.model.prototype.tableName;
-            const whiteListSet = await Bookshelf.ColumnCache.getColumnsForTable(tableName);
+            //['created_at', null]
+            let hasTimestamps = this.model.prototype.hasTimestamps;
+            let createdAtName;
+            let updatedAtName;
+
+            if (hasTimestamps === true){
+                createdAtName = "created_at"
+                updatedAtName = "updated_at"
+            } else if (Array.isArray(hasTimestamps)){
+                let createdAtName = hasTimestamps[0]
+                let updatedAtName = hasTimestamps[1]
+            }
 
             let toInsert = [];
             let toUpdate = [];
+            const now = new Date()
             for (let i = 0; i < this.models.length; i++) {
                 let currentModel = this.models[i];
                 let attributes = currentModel.attributes;
-                for (let key in attributes) {
-                    if(!whiteListSet.has(key)) {
-                        //for some reason attributes obj has no hasOwnProperty method ???!?
-                        delete attributes[key];
-                    }
+                if (hasTimestamps !== false && Array.isArray(hasTimestamps)){
+
+                    if (createdAtName) attributes[createdAtName] = now
+                    if (updatedAtName) attributes[updatedAtName] = now
+                }
+                //todo: need to check the idAttribute incase overriden default id
+                if (attributes.id === undefined){
+                    await currentModel.triggerThen("creating", currentModel)
                 }
                 toInsert.push(attributes)
             }
@@ -34,7 +48,7 @@ module.exports = function (Bookshelf){
 
             //only certain datbases return full data on rows, which we need to construct new collection.
             if (DIALECTS_WITH_FULL_RETURN.has(Bookshelf.knex.client.config.client)){
-               return this.forgeCollection(res);
+                return this.forgeCollection(res);
             } else {
                 return true;
             }
