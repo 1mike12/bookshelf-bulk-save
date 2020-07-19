@@ -5,21 +5,18 @@ Bookshelf natively does not come with a bulk insert option. Instead the only opt
 
 This does not run updates, as bulk updates are not supported natively by knex.
 
-This plugin adds a `bulkSave()` method to Collection objects. If your db dialect supports it, it will also return a new Collection with the updated ids for any new models you save, similar to how `save()` on a single model returns the updated model. As of writing this is (pg, mssql, oracledb). Otherwise it will simply return true on successful insert.
-
-All models are cleaned of any column names that aren't in the relevant table. It does this by relying on [bookshelf-column-cache](https://github.com/1mike12/bookshelf-column-cache) to check for a whitelist of valid column names.
+This plugin adds a `bulkSave()` method to Collection objects. If your db dialect supports it, it will also return the inserted JSON data, similar to how `save()` on a single model returns the updated model. As of writing this is (pg, mssql, oracledb). Otherwise it will simply return `true` on successful insert.
 
 requires es6 syntax to work.
 
 ## Installation
 ``` javascript
-npm install bookshelf-bulk-insert bookshelf-column-cache
+npm install bookshelf-bulk-save
 ```
 Then in your bookshelf configuration:
 ``` javascript
 var bookshelf = require('bookshelf')(knex);
-bookshelf.plugin(require('bookshelf-column-cache');
-bookshelf.plugin(require('bookshelf-bulk-insert');
+bookshelf.plugin(require('bookshelf-bulk-save');
 ```
 
 Usage
