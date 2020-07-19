@@ -9,7 +9,7 @@ module.exports = function (Bookshelf){
             const IS_FULL_RETURN_DIALECT = DIALECTS_WITH_FULL_RETURN.includes(Bookshelf.knex.client.config.client)
             if(this.models.length === 0) {
                 if(IS_FULL_RETURN_DIALECT) {
-                    return this.forgeCollection();
+                    return [];
                 } else {
                     return true;
                 }
@@ -57,11 +57,19 @@ module.exports = function (Bookshelf){
                 await currentModel.triggerThen("saving", currentModel)
 
             }
-            let res = await Bookshelf.knex(tableName).insert(toInsert).returning("*");
+            let insertedJson = []
+            if (toInsert.length > 0){
+                insertedJson = await Bookshelf.knex(tableName).insert(toInsert).returning("*");
+            }
+
+            let updatedJson = []
+            if (toUpdate.length > 0){
+                throw new Error("bulk updating not supported")
+            }
 
             //only certain datbases return full data on rows, which we need to construct new collection.
             if (IS_FULL_RETURN_DIALECT){
-                return this.forgeCollection(res);
+                return [...insertedJson, ...updatedJson];
             } else {
                 return true;
             }
