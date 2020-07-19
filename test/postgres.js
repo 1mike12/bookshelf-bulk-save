@@ -16,26 +16,24 @@ const userCollection = Collection.forge([
     }
 ]);
 
+before(async ()=> await db.refresh())
 describe("postgres bulk save", function (){
     const Users = db.bookshelf.Collection.extend({model: User});
     const UserCollection = Users.forge([
         {
             name: "bob",
-            foo: "bar"
+            age: 20
         },
         {
             name: "joe",
-            foo: "bar"
+            age: 21
         }
     ]);
 
     it("should return full collection", async () => {
-        await db.refresh();
-        let hasError = false;
         let users = await UserCollection.bulkSave();
         expect(users.length).equal(2);
         expect(typeof users !== "boolean").equals(true);
-        expect(users instanceof db.bookshelf.Collection)
     });
 
 });

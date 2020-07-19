@@ -24,11 +24,11 @@
   "scripts": {},
   "homepage": "https://github.com/1mike12/bookshelf-bulk-save",
   "devDependencies": {
-    "bookshelf": "^0.13.3",
-    "chai": "^4.1.2",
-    "knex": "^0.15.2",
-    "mocha": "^5.2.0",
-    "pg": "^7.4.3",
+    "bookshelf": "^1.0.1",
+    "chai": "^4.2.0",
+    "knex": "^0.21.1",
+    "mocha": "^7.2.0",
+    "pg": "^8.2.1",
     "sqlite3": "^5.0.0"
   },
   "readmeFilename": "README.md"

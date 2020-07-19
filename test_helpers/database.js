@@ -5,25 +5,24 @@ bookshelf.plugin(require("../index"));
 
 class Database {
 
-    static async refresh(){
+    static async refresh(terminate = false){
         await Database.rollbackAllMigrations();
         await Database.latestMigrations();
+        if (terminate) process.exit(0)
     }
 
     static async rollbackAllMigrations(){
         const migrate = knex.migrate;
-
-        let isAtBaseMigration = false;
-        do {
-            await migrate.forceFreeMigrationsLock();
-            let migration = await migrate.currentVersion(knexFile.migrations);
-            if (migration !== "none"){
-                migrate.rollback(knexFile.migrations)
-            } else {
-                isAtBaseMigration = true;
-            }
-        } while (isAtBaseMigration === false);
+        await migrate.forceFreeMigrationsLock()
+        let m = await migrate.currentVersion(knexFile.migrations)
+        if (m !== "none"){
+            await migrate.rollback(knexFile.migrations)
+            await Database.rollbackAllMigrations()
+        } else {
+            return
+        }
     }
+
 
     static async latestMigrations(){
         await knex.migrate.latest();

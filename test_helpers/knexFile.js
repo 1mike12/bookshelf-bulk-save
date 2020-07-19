@@ -21,7 +21,7 @@ module.exports = {
             charset: 'utf8',
             host: "localhost",
             port: "5432",
-            user: "mike",
+            user: "bulk_save",
             password: "123",
             database: "bookshelf_bulk_insert"
         },
