@@ -1,4 +1,4 @@
-const DIALECTS_WITH_FULL_RETURN = new Set(["pg", "oracledb", "mssql"]);
+const DIALECTS_WITH_FULL_RETURN = ["pg", "oracledb", "mssql"];
 
 module.exports = function (Bookshelf){
     Bookshelf.Collection = Bookshelf.Collection.extend({
@@ -6,14 +6,17 @@ module.exports = function (Bookshelf){
          * @return {Promise<Array|Boolean>} returns array of JSON values of inserted items. Or true for databases that do not support return values
          */
         bulkSave: async function (){
+            const IS_FULL_RETURN_DIALECT = DIALECTS_WITH_FULL_RETURN.includes(Bookshelf.knex.client.config.client)
             if(this.models.length === 0) {
-                if(DIALECTS_WITH_FULL_RETURN.has(Bookshelf.knex.client.config.client)) {
+                if(IS_FULL_RETURN_DIALECT) {
                     return this.forgeCollection();
                 } else {
                     return true;
                 }
             }
             const tableName = this.model.prototype.tableName;
+            if (tableName === undefined) throw new Error("no table name defined on model")
+
             //['created_at', null]
             let hasTimestamps = this.model.prototype.hasTimestamps;
             let createdAtName;
@@ -23,8 +26,8 @@ module.exports = function (Bookshelf){
                 createdAtName = "created_at"
                 updatedAtName = "updated_at"
             } else if (Array.isArray(hasTimestamps)){
-                let createdAtName = hasTimestamps[0]
-                let updatedAtName = hasTimestamps[1]
+                createdAtName = hasTimestamps[0]
+                updatedAtName = hasTimestamps[1]
             }
 
             let toInsert = [];
@@ -32,22 +35,32 @@ module.exports = function (Bookshelf){
             const now = new Date()
             for (let i = 0; i < this.models.length; i++) {
                 let currentModel = this.models[i];
+                let idName = currentModel.idAttribute
                 let attributes = currentModel.attributes;
-                if (hasTimestamps !== false && Array.isArray(hasTimestamps)){
 
+                //set timestamps
+                if (hasTimestamps !== false && Array.isArray(hasTimestamps)){
                     if (createdAtName) attributes[createdAtName] = now
                     if (updatedAtName) attributes[updatedAtName] = now
                 }
-                //todo: need to check the idAttribute incase overriden default id
-                if (attributes.id === undefined){
+
+                //creating new
+                if (attributes[idName] === undefined){
                     await currentModel.triggerThen("creating", currentModel)
+                    toInsert.push(attributes)
                 }
-                toInsert.push(attributes)
+                //updating existing
+                else {
+                    await currentModel.triggerThen("updating", currentModel)
+                    toUpdate.push(attributes)
+                }
+                await currentModel.triggerThen("saving", currentModel)
+
             }
             let res = await Bookshelf.knex(tableName).insert(toInsert).returning("*");
 
             //only certain datbases return full data on rows, which we need to construct new collection.
-            if (DIALECTS_WITH_FULL_RETURN.has(Bookshelf.knex.client.config.client)){
+            if (IS_FULL_RETURN_DIALECT){
                 return this.forgeCollection(res);
             } else {
                 return true;

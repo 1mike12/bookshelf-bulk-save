@@ -25,12 +25,11 @@
   "homepage": "https://github.com/1mike12/bookshelf-bulk-save",
   "devDependencies": {
     "bookshelf": "^0.13.3",
-    "bookshelf-column-cache": "^1.0.2",
     "chai": "^4.1.2",
     "knex": "^0.15.2",
     "mocha": "^5.2.0",
     "pg": "^7.4.3",
-    "sqlite3": "^4.0.2"
+    "sqlite3": "^5.0.0"
   },
   "readmeFilename": "README.md"
 }
