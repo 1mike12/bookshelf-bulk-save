@@ -1,12 +1,11 @@
 # Bookshelf Bulk Save
-This plugin works with Bookshelf.js, available here http://bookshelfjs.org.
+This plugin adds a `bulkSave()` method to [Bookshelf.js](http://bookshelfjs.org) Collection objects.
 
-Bookshelf natively does not come with a bulk insert option. Instead the only option is to use `invokeThen("save")` on collections. The underlying knex library does however have bulk inserts.
+Bookshelf natively does not come with a bulk insert option. Instead, the only option is to use `invokeThen("save")` on collections. The underlying knex library does however have bulk inserts.
 
-This does not run updates, as bulk updates are not supported natively by knex.
+note: This does not run updates, as bulk updates are not supported natively by knex.
 
-This plugin adds a `bulkSave()` method to Collection objects. If your db dialect supports it, it will also update the new ids and return the collection, similar to how `save()` on a single model returns the updated model. As of writing this is (pg, mssql, oracledb). Otherwise it will simply return `true` on successful insert.
-
+## Requirements
 requires es6 syntax to work.
 
 ## Installation
@@ -15,11 +14,13 @@ npm install bookshelf-bulk-save
 ```
 Then in your bookshelf configuration:
 ``` javascript
-var bookshelf = require('bookshelf')(knex);
+const bookshelf = require('bookshelf')(knex);
 bookshelf.plugin(require('bookshelf-bulk-save');
 ```
 
-Usage
+Usage 
+
+If your db dialect supports it, it will also update the new ids and return the collection, similar to how `save()` on a single model returns the updated model. As of writing this is (pg, mssql, oracledb). Otherwise it will simply return `true` on successful insert.
 ``` javascript
 //migration
 module.exports = {
@@ -51,6 +52,4 @@ let users = await UserCollection.bulkSave();
 
 //if using one of the supported dialects that returns inserted rows
 //users = [{id: 1, name: "bob}, {id:2, name: "joe"}]
-
-
 ```
